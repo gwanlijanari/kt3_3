@@ -17,6 +17,12 @@ import app
 class TestApp(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        os.makedirs(os.environ["DATA_DIR"], exist_ok=True)
+        with app.connect() as db:
+            db.execute(
+                "CREATE TABLE IF NOT EXISTS requests (id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL, created TEXT NOT NULL, request_key TEXT NOT NULL UNIQUE)"
+            )
+
         cls.server = app.ThreadingHTTPServer(("127.0.0.1", 8080), app.Handler)
         cls.thread = threading.Thread(target=cls.server.serve_forever)
         cls.thread.daemon = True
